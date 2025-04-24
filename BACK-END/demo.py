@@ -162,6 +162,68 @@ def download_instagram_route():
     except Exception as e:
         return f"Instagram video download failed: {str(e)}", 500
 
+@app.route('/download_twitter', methods=['POST'])
+def download_twitter_route():
+    url = request.form['url']
+    try:
+        formats = get_available_formats(url)
+        valid_formats = [f for f in formats if f.get('height')]
+        if not valid_formats:
+            return "No valid video formats found for Twitter.", 400
+
+        format_choice = max(valid_formats, key=lambda f: f['height'])['format_id']
+        title, thumbnail, size, duration = get_video_details(url)
+        video_size = format_size(size)
+        video_duration = format_duration(duration)
+        safe_title = secure_filename(f"{title[:150].strip()}.mp4")
+
+        download_folder = get_download_folder()
+        file_path = os.path.join(download_folder, safe_title)
+
+        download_video(url, f'{format_choice}+bestaudio', file_path)
+
+        return redirect(url_for('download_success1',
+                                platform='Twitter (X)',
+                                video_filename=safe_title,
+                                video_title=title,
+                                thumbnail_url=thumbnail,
+                                video_size=video_size,
+                                duration=video_duration))
+    except Exception as e:
+        return f"Twitter (X) video download failed: {str(e)}", 500
+
+
+@app.route('/download_tiktok', methods=['POST'])
+def download_tiktok_route():
+    url = request.form['url']
+    try:
+        formats = get_available_formats(url)
+        valid_formats = [f for f in formats if f.get('height')]
+        if not valid_formats:
+            return "No valid video formats found for TikTok.", 400
+
+        format_choice = max(valid_formats, key=lambda f: f['height'])['format_id']
+        title, thumbnail, size, duration = get_video_details(url)
+        video_size = format_size(size)
+        video_duration = format_duration(duration)
+        safe_title = secure_filename(f"{title[:150].strip()}.mp4")
+
+        download_folder = get_download_folder()
+        file_path = os.path.join(download_folder, safe_title)
+
+        download_video(url, f'{format_choice}+bestaudio', file_path)
+
+        return redirect(url_for('download_success1',
+                                platform='TikTok',
+                                video_filename=safe_title,
+                                video_title=title,
+                                thumbnail_url=thumbnail,
+                                video_size=video_size,
+                                duration=video_duration))
+    except Exception as e:
+        return f"TikTok video download failed: {str(e)}", 500
+
+
 @app.route('/download_success')
 def download_success():
     return render_template('download_success.html',
