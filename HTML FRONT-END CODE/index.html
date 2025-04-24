@@ -9,19 +9,15 @@
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
 
-  <!-- Free Font Awesome (Safe Alternative to Pro Kit) -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-a1gk7jx7RhO6ZLa9t6ibE2vnK7sJXs1V+nPKrbBTSrDblU+yJP1Hp/UBjtcXqUAmrPiN7E9mt+GZ5mW9Vprf3Q==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-a1gk7jx7RhO6ZLa9t6ibE2vnK7sJXs1V+nPKrbBTSrDblU+yJP1Hp/UBjtcXqUAmrPiN7E9mt+GZ5mW9Vprf3Q==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
   <style>
     :root {
-  --bg: #1e0f2f;            /* midnight purple */
-  --light: #cba6f7;         /* enchanted lilac */
-  --dark: #3b1a59;          /* royal plum */
-  --shadow-light: #f8eaff;  /* spellbound mist */
-  --shadow-dark: #140c1a;   /* velvet night */
-}
-
-
+      --bg: #1e0f2f;
+      --light: #cba6f7;
+      --dark: #3b1a59;
+    }
 
     * {
       margin: 0;
@@ -33,16 +29,14 @@
     body {
       background: var(--bg);
       min-height: 100vh;
-      color: #222;
+      color: #fff;
     }
 
     header {
       padding: 50px 20px;
       text-align: center;
-      color: #ffff;
       box-shadow: inset 8px 8px 16px var(--dark), inset -8px -8px 16px var(--light);
       border-radius: 0 0 20px 20px;
-      background: var(--bg);
     }
 
     header img {
@@ -55,15 +49,9 @@
       margin-top: 10px;
     }
 
-    header p {
-      font-size: 1.1rem;
-      color: #ffff;
-    }
-
     nav {
       display: flex;
       justify-content: center;
-      background: var(--bg);
       gap: 25px;
       padding: 15px;
       box-shadow: 5px 5px 10px var(--dark), -5px -5px 10px var(--light);
@@ -71,10 +59,10 @@
 
     nav a {
       text-decoration: none;
-      color: #ffff;
-      background: var(--bg);
+      color: #fff;
       padding: 10px 25px;
       border-radius: 25px;
+      background: var(--bg);
       box-shadow: 6px 6px 12px var(--dark), -6px -6px 12px var(--light);
       transition: all 0.2s ease;
     }
@@ -83,46 +71,40 @@
       box-shadow: inset 4px 4px 6px var(--dark), inset -4px -4px 6px var(--light);
     }
 
-    .container {
+    .slider-container {
+      position: relative;
+      width: 100%;
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding: 50px 0;
+      scroll-behavior: smooth;
+    }
+
+    .slider {
       display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 30px;
-      padding: 50px 20px;
+      padding-left: 20px;
     }
 
     .card {
-      width: 320px;
+      width: 340px;
       padding: 25px;
       border-radius: 20px;
-      color: #fff;
       box-shadow: 10px 10px 20px var(--dark), -10px -10px 20px var(--light);
       transition: 0.3s;
+      color: #fff;
+      margin-right: 20px;
+      flex-shrink: 0;
     }
 
     .card:hover {
       transform: translateY(-5px);
     }
 
-    .youtube-card {
-      background-color: #e20d0d;
-    }
-
-    .facebook-card {
-      background-color: #1329f0;
-    }
-
-    .instagram-card {
-      background-color: #e40dae;
-    }
-
-    .card img {
-      width: 100%;
-      height: 180px;
-      object-fit: cover;
-      border-radius: 15px;
-      margin-bottom: 15px;
-    }
+    .youtube-card { background-color: #FF0000; }
+    .facebook-card { background-color: #1877F2; }
+    .instagram-card { background-color: #E1306C; }
+    .twitter-card { background-color: #1DA1F2; }
+    .tiktok-card { background-color: #010101; }
 
     .card h3 {
       font-size: 22px;
@@ -131,7 +113,7 @@
 
     .card p {
       font-size: 14px;
-      color: #fff;
+      margin-bottom: 10px;
     }
 
     input[type="url"], select {
@@ -139,19 +121,18 @@
       padding: 10px;
       border-radius: 10px;
       border: none;
-      margin-top: 10px;
-      margin-bottom: 10px;
       background: var(--bg);
       box-shadow: inset 4px 4px 6px var(--dark), inset -4px -4px 6px var(--light);
-      color: #ffff;
+      color: #fff;
+      margin: 10px 0;
     }
 
     .card button {
       width: 100%;
       padding: 10px;
       font-weight: bold;
-      color: #fff;
       background-color: #000;
+      color: #fff;
       border: none;
       border-radius: 10px;
       cursor: pointer;
@@ -160,6 +141,14 @@
 
     .card button:hover {
       background-color: #333;
+    }
+
+    .how-to-line {
+      margin-top: 15px;
+      font-size: 13px;
+      color: #f0f0f0;
+      font-style: italic;
+      text-align: center;
     }
 
     .spinner {
@@ -171,52 +160,76 @@
       display: inline-block;
     }
 
+    .slider-button {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(0, 0, 0, 0.5);
+      color: white;
+      border: none;
+      padding: 10px;
+      cursor: pointer;
+      z-index: 10;
+    }
+
+    .slider-button-left {
+      left: 10px;
+    }
+
+    .slider-button-right {
+      right: 10px;
+    }
+
     .instructions {
       text-align: center;
+      padding: 40px 20px;
+      margin: 40px 20px;
+      border-radius: 20px;
       background: var(--bg);
       box-shadow: inset 6px 6px 12px var(--dark), inset -6px -6px 12px var(--light);
-      padding: 50px 20px;
-      margin: 50px 20px;
-      border-radius: 20px;
     }
 
-    .instructions h2 {
-        color: #ffff;
-      font-size: 2rem;
-      margin-bottom: 20px;
-    }
-
-    .instructions h3 {
-      color: #ffff;
-      margin-top: 20px;
+    .instructions h2, .instructions h3, .instructions h4 {
+      color: #fff;
     }
 
     .instructions h4 {
-      color: #cccccc;
       font-weight: normal;
-      font-size: 1rem;
+      color: #ccc;
     }
 
     footer {
       text-align: center;
       padding: 15px;
-      background: var(--bg);
       font-size: 14px;
-      color: #555;
+      color: #aaa;
+      background: var(--bg);
       box-shadow: inset 5px 5px 10px var(--dark), inset -5px -5px 10px var(--light);
     }
 
     footer a {
-      color: #ffff;
+      color: #fff;
       text-decoration: none;
     }
 
     footer a:hover {
       text-decoration: underline;
     }
+
+    @media (max-width: 600px) {
+      .card {
+        width: 90%;
+        margin: auto;
+        margin-bottom: 30px;
+      }
+
+      .slider-button {
+        display: none;
+      }
+    }
+
   </style>
 </head>
-
 <body>
 
 <header>
@@ -229,61 +242,39 @@
   <a href="#"><i class="fab fa-youtube"></i> YouTube</a>
   <a href="#"><i class="fab fa-facebook"></i> Facebook</a>
   <a href="#"><i class="fab fa-instagram"></i> Instagram</a>
+  <a href="#"><i class="fab fa-twitter"></i> Twitter</a>
+  <a href="#"><i class="fab fa-tiktok"></i> TikTok</a>
 </nav>
 
-<div class="container">
+<div class="slider-container" id="sliderContainer">
+  <div class="slider" id="slider">
+    
+    <!-- Cards -->
+    {% for platform in ['youtube', 'facebook', 'instagram', 'twitter', 'tiktok'] %}
+    <div class="card {{ platform }}-card">
+      <h3>{{ platform.capitalize() }} Downloader</h3>
+      <p>Download from {{ platform.capitalize() }} with ease.</p>
+      <form action="/download_{{ platform }}" method="POST" onsubmit="showLoadingSpinner(event, '{{ platform }}')">
+        <input type="url" name="url" placeholder="https://{{ platform }}.com/..." required>
+        <select name="quality" required>
+          <option value="default">Default</option>
+          {% if platform == 'youtube' %}
+          <option value="1">720p</option>
+          <option value="2">1080p</option>
+          <option value="3">2K</option>
+          <option value="4">4K</option>
+          {% endif %}
+        </select>
+        <button type="submit" id="{{ platform }}DownloadButton">
+          Download <span class="spinner" id="{{ platform }}Spinner"><i class="fas fa-spinner fa-spin"></i></span>
+        </button>
+      </form>
+      <div class="how-to-line">📌 How to use: Paste link → Choose quality → Click Download</div>
+    </div>
+    {% endfor %}
 
-  <!-- YouTube Downloader -->
-  <div class="card youtube-card">
-
-    <h3>YouTube Downloader</h3>
-    <p>Download high-quality videos from YouTube in just a few clicks.</p>
-    <form action="/download_youtube" method="POST" onsubmit="showLoadingSpinner(event, 'youtube')">
-      <input type="url" name="url" placeholder="https://www.youtube.com/watch?v=..." required>
-      <select name="quality" required>
-        <option value="best">Best Quality</option>
-        <option value="1">720p</option>
-        <option value="2">1080p</option>
-        <option value="3">2K</option>
-        <option value="4">4K</option>
-      </select>
-      <button type="submit" id="youtubeDownloadButton">
-        Download <span class="spinner" id="youtubeSpinner"><i class="fas fa-spinner fa-spin"></i></span>
-      </button>
-    </form>
   </div>
 
-  <!-- Facebook Downloader -->
-  <div class="card facebook-card">
-
-    <h3>Facebook Downloader</h3>
-    <p>Download videos and pictures from Facebook with ease.</p>
-    <form action="{{ url_for('download_facebook_route') }}" method="POST" onsubmit="showLoadingSpinner(event, 'facebook')">
-      <input type="url" name="url" placeholder="https://www.facebook.com/.../videos/..." required>
-      <select name="quality" required>
-        <option value="low">Default</option>
-      </select>
-      <button type="submit" id="facebookDownloadButton">
-        Download <span class="spinner" id="facebookSpinner"><i class="fas fa-spinner fa-spin"></i></span>
-      </button>
-    </form>
-  </div>
-
-  <!-- Instagram Downloader -->
-  <div class="card instagram-card">
-
-    <h3>Instagram Downloader</h3>
-    <p>Get Instagram videos and pictures in a snap.</p>
-    <form action="{{ url_for('download_instagram_route') }}" method="POST" onsubmit="showLoadingSpinner(event, 'instagram')">
-      <input type="url" name="url" placeholder="https://www.instagram.com/..." required>
-      <select name="quality" required>
-        <option value="low">Default</option>
-      </select>
-      <button type="submit" id="instagramDownloadButton">
-        Download <span class="spinner" id="instagramSpinner"><i class="fas fa-spinner fa-spin"></i></span>
-      </button>
-    </form>
-  </div>
 
 </div>
 
@@ -297,9 +288,7 @@
   <h4>Select the resolution or format.</h4>
   <h3>4. Click Download</h3>
   <h4>Your file will be ready in seconds.</h4>
-<h3>                                       </h3>
-  <h4>This website is not affiliated with YouTube, Facebook, or Instagram. All trademarks and copyrights belong to their respective owners.</h4>
-
+  <h4>This website is not affiliated with YouTube, Facebook,  Instagram, Twitter, Tiktok. All rights belong to their respective owners.</h4>
 </div>
 
 <footer>
@@ -315,6 +304,12 @@
     spinner.classList.add('active');
     btn.innerHTML = "Please wait... " + spinner.outerHTML;
     event.target.submit();
+  }
+
+  function scrollSlider(direction) {
+    const container = document.getElementById("sliderContainer");
+    const scrollAmount = 360; // width of card + margin
+    container.scrollLeft += direction * scrollAmount;
   }
 </script>
 
