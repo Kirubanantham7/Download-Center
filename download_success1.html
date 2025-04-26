@@ -5,7 +5,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>{{ video_title }} - Download Success</title>
-  <link rel="preload" href="ic3.png" as="image">
+  <link rel="icon" href="ic3.png">
 
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
@@ -191,11 +191,7 @@
         <i class="fas fa-video"></i> Download Video
       </a>
 
-      {% if audio_filename %}
-      <a href="{{ url_for('download_file', video_filename=audio_filename) }}" class="button" download>
-        <i class="fas fa-music"></i> Download Audio
-      </a>
-      {% endif %}
+
 
       <a href="index" class="button">
         <i class="fas fa-home"></i> Back to Home
