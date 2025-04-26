@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{{ video_title }} - Download Success</title>
+  <link rel="icon" href="{{ url_for('static', filename='ic3.png') }}">
+
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+
+   <!-- Free Font Awesome (Safe Alternative to Pro Kit) -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-a1gk7jx7RhO6ZLa9t6ibE2vnK7sJXs1V+nPKrbBTSrDblU+yJP1Hp/UBjtcXqUAmrPiN7E9mt+GZ5mW9Vprf3Q==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+
+  <style>
+    :root {
+      --bg: #1e0f2f;
+      --light: #cba6f7;
+      --dark: #3b1a59;
+      --shadow-light: #f8eaff;
+      --shadow-dark: #140c1a;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      background: var(--bg);
+      min-height: 100vh;
+      color: #fff;
+      overflow-x: hidden;
+    }
+
+    header {
+      padding: 50px 20px;
+      text-align: center;
+      background: var(--bg);
+      box-shadow: inset 8px 8px 16px var(--dark), inset -8px -8px 16px var(--light);
+      position: relative;
+      border-radius: 0 0 20px 20px;
+    }
+
+    header::before {
+      content: '';
+      background-image: url('{{ url_for("static", filename="web bck.jpg") }}');
+      background-size: cover;
+      background-position: center;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      filter: blur(8px);
+      opacity: 0.25;
+    }
+
+    header h1 {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+      color: #fff;
+    }
+
+    header p {
+      font-size: 1.1rem;
+      color: #fff;
+    }
+
+    .container {
+      display: flex;
+      justify-content: center;
+      padding: 50px 20px;
+    }
+
+    .success-message {
+      background: var(--bg);
+      box-shadow: 10px 10px 20px var(--dark), -10px -10px 20px var(--light);
+      padding: 30px;
+      border-radius: 20px;
+      max-width: 600px;
+      text-align: center;
+      width: 100%;
+    }
+
+    .success-message h2 {
+      font-size: 2rem;
+      color: #cba6f7;
+      margin-bottom: 20px;
+    }
+
+    .success-message p {
+      font-size: 1rem;
+      color: #ddd;
+      margin-bottom: 15px;
+      word-wrap: break-word;
+      overflow-wrap: anywhere;
+    }
+
+    .success-message a {
+      color: #f8eaff;
+      text-decoration: none;
+      word-wrap: break-word;
+      overflow-wrap: anywhere;
+      display: inline-block;
+      max-width: 100%;
+    }
+
+    .success-message img {
+      width: 100%;
+      max-height: 280px;
+      object-fit: contain;
+      border-radius: 15px;
+      margin-top: 20px;
+    }
+
+    .button {
+      background-color: #000;
+      color: #fff;
+      padding: 10px 25px;
+      font-size: 1rem;
+      border-radius: 10px;
+      margin: 10px 8px 0;
+      display: inline-block;
+      box-shadow: 6px 6px 12px var(--dark), -6px -6px 12px var(--light);
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+
+    .button:hover {
+      background-color: #333;
+      transform: translateY(-2px);
+    }
+
+    .button:active {
+      transform: scale(0.98);
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <h1>{{ platform }} Download Successful!</h1>
+    <p>Video: {{ video_title }}</p>
+  </header>
+
+  <div class="container">
+    <div class="success-message">
+      <h2>Your Download is Ready!</h2>
+
+      <p>Video URL:
+        <a href="{{ url_for('download_file', video_filename=video_filename) }}" target="_blank">
+          {{ video_filename }}
+        </a>
+      </p>
+
+      <p>Selected Quality: {{ quality }}</p>
+
+    {% if thumbnail_url %}
+      <img src="{{ thumbnail_url }}" alt="Video Thumbnail">
+    {% endif %}
+    
+
+      <br>
+
+      <p>File Size: {{ video_size }}</p>
+      <p>Duration: {{ duration }}</p>
+
+
+      <a href="{{ url_for('download_file', video_filename=video_filename) }}" class="button" download>
+        <i class="fas fa-video"></i> Download Video
+      </a>
+
+
+      <a href="{{ url_for('download_file', video_filename=audio_filename) }}" class="button" download>
+        <i class="fas fa-music"></i> Download Audio
+      </a>
+
+
+
+      <a href="{{ url_for('index') }}" class="button">
+        <i class="fas fa-home"></i> Back to Home
+      </a>
+    </div>
+  </div>
+
+</body>
+
+</html>
