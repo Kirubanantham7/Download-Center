@@ -200,7 +200,8 @@
 <body>
 
 <header>
-  <img src="./static/ic2.png"alt="Logo">
+  <img src="{{ url_for('static', filename='ic2.png') }}" alt="icon">
+
   <h1>Welcome to the Download Center</h1>
   <p>Choose a platform to start downloading videos and images!</p>
 </header>
