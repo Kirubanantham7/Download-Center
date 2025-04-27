@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Download Center</title>
+  <link rel="icon" href="/static/ic3.png">
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-a1gk7jx7RhO6ZLa9t6ibE2vnK7sJXs1V+nPKrbBTSrDblU+yJP1Hp/UBjtcXqUAmrPiN7E9mt+GZ5mW9Vprf3Q==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  <style>
+    :root {
+      --bg: #1e0f2f;
+      --light: #cba6f7;
+      --dark: #3b1a59;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      background: var(--bg);
+      min-height: 100vh;
+      color: #fff;
+    }
+
+    header {
+      padding: 50px 20px;
+      text-align: center;
+      box-shadow: inset 8px 8px 16px var(--dark), inset -8px -8px 16px var(--light);
+      border-radius: 0 0 20px 20px;
+    }
+
+    header img {
+      width: 70px;
+      height: 50px;
+    }
+
+    header h1 {
+      font-size: 2.5rem;
+      margin-top: 10px;
+    }
+
+    nav {
+      display: flex;
+      justify-content: center;
+      gap: 25px;
+      padding: 15px;
+      box-shadow: 5px 5px 10px var(--dark), -5px -5px 10px var(--light);
+    }
+
+    nav a {
+      text-decoration: none;
+      color: #fff;
+      padding: 10px 25px;
+      border-radius: 25px;
+      background: var(--bg);
+      box-shadow: 6px 6px 12px var(--dark), -6px -6px 12px var(--light);
+      transition: all 0.2s ease;
+    }
+
+    nav a:hover {
+      box-shadow: inset 4px 4px 6px var(--dark), inset -4px -4px 6px var(--light);
+    }
+
+    .slider-container {
+      position: relative;
+      width: 100%;
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding: 50px 0;
+      scroll-behavior: smooth;
+    }
+
+    .slider {
+      display: flex;
+      padding-left: 20px;
+    }
+
+    .card {
+      width: 340px;
+      padding: 25px;
+      border-radius: 20px;
+      box-shadow: 10px 10px 20px var(--dark), -10px -10px 20px var(--light);
+      transition: 0.3s;
+      color: #fff;
+      margin-right: 20px;
+      flex-shrink: 0;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+    }
+
+    .youtube-card { background-color: #FF0000; }
+    .facebook-card { background-color: #1877F2; }
+    .instagram-card { background-color: #E1306C; }
+    .twitter-card { background-color: #1DA1F2; }
+    .tiktok-card { background-color: #010101; }
+
+    .card h3 {
+      font-size: 22px;
+      margin-bottom: 10px;
+    }
+
+    .card p {
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
+
+    input[type="url"], select {
+      width: 100%;
+      padding: 10px;
+      border-radius: 10px;
+      border: none;
+      background: var(--bg);
+      box-shadow: inset 4px 4px 6px var(--dark), inset -4px -4px 6px var(--light);
+      color: #fff;
+      margin: 10px 0;
+    }
+
+    .card button {
+      width: 100%;
+      padding: 10px;
+      font-weight: bold;
+      background-color: #000;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      box-shadow: 6px 6px 12px var(--dark), -6px -6px 12px var(--light);
+    }
+
+    .card button:hover {
+      background-color: #333;
+    }
+
+    .how-to-line {
+      margin-top: 15px;
+      font-size: 13px;
+      color: #f0f0f0;
+      font-style: italic;
+      text-align: center;
+    }
+
+    .spinner {
+      display: none;
+      margin-left: 10px;
+    }
+
+    .spinner.active {
+      display: inline-block;
+    }
+
+    .slider-button {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(0, 0, 0, 0.5);
+      color: white;
+      border: none;
+      padding: 10px;
+      cursor: pointer;
+      z-index: 10;
+    }
+
+    .slider-button-left {
+      left: 10px;
+    }
+
+    .slider-button-right {
+      right: 10px;
+    }
+
+    .instructions {
+      text-align: center;
+      padding: 40px 20px;
+      margin: 40px 20px;
+      border-radius: 20px;
+      background: var(--bg);
+      box-shadow: inset 6px 6px 12px var(--dark), inset -6px -6px 12px var(--light);
+    }
+
+    .instructions h2, .instructions h3, .instructions h4 {
+      color: #fff;
+    }
+
+    .instructions h4 {
+      font-weight: normal;
+      color: #ccc;
+    }
+
+    footer {
+      text-align: center;
+      padding: 15px;
+      font-size: 14px;
+      color: #aaa;
+      background: var(--bg);
+      box-shadow: inset 5px 5px 10px var(--dark), inset -5px -5px 10px var(--light);
+    }
+
+    footer a {
+      color: #fff;
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 600px) {
+      .card {
+        width: 90%;
+        margin: auto;
+        margin-bottom: 30px;
+      }
+
+      .slider-button {
+        display: none;
+      }
+    }
+
+  </style>
+</head>
+<body>
+
+<header>
+  <a href="#"><img src="/static/ic2.png" alt="Logo"></a>
+  <h1>Welcome to the Download Center</h1>
+  <p>Choose a platform to start downloading videos and images!</p>
+</header>
+
+<nav>
+  <a href="#"><i class="fab fa-youtube"></i> YouTube</a>
+  <a href="#"><i class="fab fa-facebook"></i> Facebook</a>
+  <a href="#"><i class="fab fa-instagram"></i> Instagram</a>
+  <a href="#"><i class="fab fa-twitter"></i> Twitter</a>
+  <a href="#"><i class="fab fa-tiktok"></i> TikTok</a>
+</nav>
+
+<div class="slider-container" id="sliderContainer">
+  <div class="slider" id="slider">
+    
+    <!-- Cards -->
+    {% for platform in ['youtube', 'facebook', 'instagram', 'twitter', 'tiktok'] %}
+    <div class="card {{ platform }}-card">
+      <h3>{{ platform.capitalize() }} Downloader</h3>
+      <p>Download from {{ platform.capitalize() }} with ease.</p>
+      <form action="/download_{{ platform }}" method="POST" onsubmit="showLoadingSpinner(event, '{{ platform }}')">
+        <input type="url" name="url" placeholder="https://{{ platform }}.com/..." required>
+        <select name="quality" required>
+          <option value="default">Default</option>
+          {% if platform == 'youtube' %}
+          <option value="1">720p</option>
+          <option value="2">1080p</option>
+          <option value="3">2K</option>
+          <option value="4">4K</option>
+          {% endif %}
+        </select>
+        <button type="submit" id="{{ platform }}DownloadButton">
+          Download <span class="spinner" id="{{ platform }}Spinner"><i class="fas fa-spinner fa-spin"></i></span>
+        </button>
+      </form>
+      <div class="how-to-line">📌 How to use: Paste link → Choose quality → Click Download</div>
+    </div>
+    {% endfor %}
+
+  </div>
+
+
+</div>
+
+<div class="instructions">
+  <h2><i class="fas fa-info-circle"></i> How to Use</h2>
+  <h3>1. Copy the Video URL</h3>
+  <h4>From your browser or app.</h4>
+  <h3>2. Paste It Above</h3>
+  <h4>Choose the correct platform card.</h4>
+  <h3>3. Choose Quality</h3>
+  <h4>Select the resolution or format.</h4>
+  <h3>4. Click Download</h3>
+  <h4>Your file will be ready in seconds.</h4>
+  <h4>This website is not affiliated with YouTube, Facebook,  Instagram, Twitter, Tiktok. All rights belong to their respective owners.</h4>
+</div>
+
+<footer>
+  <a href="Copy&Rights.HTML">© 2025 Free Video Downloader - All Rights Reserved</a>
+</footer>
+
+<script>
+  function showLoadingSpinner(event, platform) {
+    event.preventDefault();
+    const btn = document.getElementById(platform + 'DownloadButton');
+    const spinner = document.getElementById(platform + 'Spinner');
+    btn.disabled = true;
+    spinner.classList.add('active');
+    btn.innerHTML = "Please wait... " + spinner.outerHTML;
+    event.target.submit();
+  }
+
+  function scrollSlider(direction) {
+    const container = document.getElementById("sliderContainer");
+    const scrollAmount = 360; // width of card + margin
+    container.scrollLeft += direction * scrollAmount;
+  }
+</script>
+
+</body>
+</html>
