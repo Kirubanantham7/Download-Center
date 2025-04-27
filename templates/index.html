@@ -1,260 +1,327 @@
-# Paste this in your Flask app file
-from flask import Flask, render_template, request, redirect, url_for, send_file
-import yt_dlp
-import os
-import platform
-from werkzeug.utils import secure_filename
-from urllib.parse import unquote
 
-app = Flask(__name__)
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Download Center</title>
+  <link rel="icon" href="{{ url_for('static', filename='ic3.png') }}">
 
-def get_download_folder():
-    if platform.system() == "Windows":
-        return os.path.join(os.environ["USERPROFILE"], "Downloads")
-    else:
-        return os.path.join(os.environ["HOME"], "Downloads")
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
 
-def get_video_details(url):
-    with yt_dlp.YoutubeDL({'quiet': True}) as ydl:
-        info = ydl.extract_info(url, download=False)
-        title = info.get('title', 'video')
-        thumbnail = info.get('thumbnail') or (info['thumbnails'][-1]['url'] if 'thumbnails' in info and info['thumbnails'] else '')
-        duration = info.get('duration', 0)
-        size = sum(f.get('filesize', 0) for f in info.get('formats', []) if f.get('filesize')) or 0
-        return title, thumbnail, size, duration
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-a1gk7jx7RhO6ZLa9t6ibE2vnK7sJXs1V+nPKrbBTSrDblU+yJP1Hp/UBjtcXqUAmrPiN7E9mt+GZ5mW9Vprf3Q==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
-def get_available_formats(url):
-    with yt_dlp.YoutubeDL({'quiet': True}) as ydl:
-        info = ydl.extract_info(url, download=False)
-        return info.get('formats', [])
-
-def format_duration(seconds):
-    minutes = int(seconds // 60)
-    secs = int(seconds % 60)
-    return f"{minutes} min {secs} sec"
-
-def format_size(bytes_size):
-    mb = bytes_size / (1024 * 1024)
-    return f"{mb:.2f} MB"
-
-def download_video(url, format_choice, filename_path):
-    ydl_opts = {
-        'format': format_choice,
-        'outtmpl': filename_path,
-        'merge_output_format': 'mp4',
-        'postprocessors': [{'key': 'FFmpegVideoConvertor', 'preferedformat': 'mp4'}],
-        'quiet': True
+  <style>
+    :root {
+      --bg: #1e0f2f;
+      --light: #cba6f7;
+      --dark: #3b1a59;
     }
-    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-        ydl.download([url])
 
-def download_audio(url, filepath):
-    ydl_opts = {
-        'format': 'bestaudio/best',
-        'outtmpl': filepath,
-        'postprocessors': [{
-            'key': 'FFmpegExtractAudio',
-            'preferredcodec': 'mp3',
-            'preferredquality': '192',
-        }],
-        'quiet': True
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
     }
-    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-        ydl.download([url])
 
-@app.route('/')
-def index():
-    return render_template('index.html')
+    body {
+      background: var(--bg);
+      min-height: 100vh;
+      color: #fff;
+    }
 
-@app.route('/download_youtube', methods=['POST'])
-def download_youtube_route():
-    url = request.form['url']
-    quality = request.form.get('quality', 'best')
-    title, thumbnail_url, size, duration = get_video_details(url)
-    video_size = format_size(size)
-    video_duration = format_duration(duration)
+    header {
+      padding: 50px 20px;
+      text-align: center;
+      box-shadow: inset 8px 8px 16px var(--dark), inset -8px -8px 16px var(--light);
+      border-radius: 0 0 20px 20px;
+    }
 
-    download_folder = get_download_folder()
-    base_title = secure_filename(title)
-    mp4_filename = f"{base_title}.mp4"
-    mp3_filename = f"{base_title}.mp3"
-    mp4_path = os.path.join(download_folder, mp4_filename)
-    mp3_path = os.path.join(download_folder, mp3_filename)
+    header img {
+      width: 70px;
+      height: 50px;
+    }
 
-    format_choice = {
-        '1': "bestvideo[height<=720]+bestaudio/best",
-        '2': "bestvideo[height<=1080]+bestaudio/best",
-        '3': "bestvideo[height<=1440]+bestaudio/best",
-        '4': "bestvideo[height<=2160]+bestaudio/best"
-    }.get(quality, "best")
+    header h1 {
+      font-size: 2.5rem;
+      margin-top: 10px;
+    }
 
-    download_video(url, format_choice, mp4_path)
-    download_audio(url, mp3_path)
+    nav {
+      display: flex;
+      justify-content: center;
+      gap: 25px;
+      padding: 15px;
+      box-shadow: 5px 5px 10px var(--dark), -5px -5px 10px var(--light);
+    }
 
-    return redirect(url_for('download_success',
-                            platform='YouTube',
-                            video_title=title,
-                            thumbnail_url=thumbnail_url,
-                            video_filename=mp4_filename,
-                            audio_filename=mp3_filename,
-                            video_size=video_size,
-                            duration=video_duration))
+    nav a {
+      text-decoration: none;
+      color: #fff;
+      padding: 10px 25px;
+      border-radius: 25px;
+      background: var(--bg);
+      box-shadow: 6px 6px 12px var(--dark), -6px -6px 12px var(--light);
+      transition: all 0.2s ease;
+    }
 
-@app.route('/download_facebook', methods=['POST'])
-def download_facebook_route():
-    url = request.form.get('url')
-    if not url:
-        return "URL is missing.", 400
-    try:
-        formats = get_available_formats(url)
-        valid_formats = [f for f in formats if f.get('height')]
-        if not valid_formats:
-            return "No valid video formats found.", 400
+    nav a:hover {
+      box-shadow: inset 4px 4px 6px var(--dark), inset -4px -4px 6px var(--light);
+    }
 
-        format_choice = max(valid_formats, key=lambda f: f['height'])['format_id']
-        title, thumbnail, size, duration = get_video_details(url)
-        video_size = format_size(size)
-        video_duration = format_duration(duration)
-        safe_title = secure_filename(f"{title[:150].strip()}.mp4")
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 30px;
+      padding: 50px 20px;
+      max-width: 1080px;
+      margin: 0 auto;
+    }
 
-        download_folder = get_download_folder()
-        file_path = os.path.join(download_folder, safe_title)
+    .card {
+      width: 300px;
+      padding: 25px;
+      border-radius: 20px;
+      box-shadow: 10px 10px 20px var(--dark), -10px -10px 20px var(--light);
+      transition: 0.3s;
+      color: #fff;
+    }
 
-        download_video(url, f'{format_choice}+bestaudio', file_path)
+    .card:hover {
+      transform: translateY(-5px);
+    }
 
-        return redirect(url_for('download_success1',
-                                platform='Facebook',
-                                video_filename=safe_title,
-                                video_title=title,
-                                thumbnail_url=thumbnail,
-                                video_size=video_size,
-                                duration=video_duration))
-    except Exception as e:
-        return f"Facebook video download failed: {str(e)}", 500
+    .youtube-card { background-color: #FF0000; }
+    .facebook-card { background-color: #1877F2; }
+    .instagram-card { background-color: #E1306C; }
+    .twitter-card { background-color: #1DA1F2; }
+    .tiktok-card { background-color: #010101; }
 
-@app.route('/download_instagram', methods=['POST'])
-def download_instagram_route():
-    url = request.form['url']
-    try:
-        formats = get_available_formats(url)
-        valid_formats = [f for f in formats if f.get('height')]
-        if not valid_formats:
-            return "No valid formats found.", 400
+    .card h3 {
+      font-size: 22px;
+      margin-bottom: 10px;
+    }
 
-        format_choice = max(valid_formats, key=lambda f: f['height'])['format_id']
-        title, thumbnail, size, duration = get_video_details(url)
-        video_size = format_size(size)
-        video_duration = format_duration(duration)
-        safe_title = secure_filename(f"{title[:150].strip()}.mp4")
+    .card p {
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
 
-        download_folder = get_download_folder()
-        file_path = os.path.join(download_folder, safe_title)
+    input[type="url"], select {
+      width: 100%;
+      padding: 10px;
+      border-radius: 10px;
+      border: none;
+      background: var(--bg);
+      box-shadow: inset 4px 4px 6px var(--dark), inset -4px -4px 6px var(--light);
+      color: #fff;
+      margin: 10px 0;
+    }
 
-        download_video(url, f'{format_choice}+bestaudio', file_path)
+    .card button {
+      width: 100%;
+      padding: 10px;
+      font-weight: bold;
+      background-color: #000;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      box-shadow: 6px 6px 12px var(--dark), -6px -6px 12px var(--light);
+    }
 
-        return redirect(url_for('download_success1',
-                                platform='Instagram',
-                                video_filename=safe_title,
-                                video_title=title,
-                                thumbnail_url=thumbnail,
-                                video_size=video_size,
-                                duration=video_duration))
-    except Exception as e:
-        return f"Instagram video download failed: {str(e)}", 500
+    .card button:hover {
+      background-color: #333;
+    }
 
-@app.route('/download_twitter', methods=['POST'])
-def download_twitter_route():
-    url = request.form['url']
-    try:
-        formats = get_available_formats(url)
-        valid_formats = [f for f in formats if f.get('height')]
-        if not valid_formats:
-            return "No valid video formats found for Twitter.", 400
+    .spinner {
+      display: none;
+      margin-left: 10px;
+    }
 
-        format_choice = max(valid_formats, key=lambda f: f['height'])['format_id']
-        title, thumbnail, size, duration = get_video_details(url)
-        video_size = format_size(size)
-        video_duration = format_duration(duration)
-        safe_title = secure_filename(f"{title[:150].strip()}.mp4")
+    .spinner.active {
+      display: inline-block;
+    }
 
-        download_folder = get_download_folder()
-        file_path = os.path.join(download_folder, safe_title)
+    .instructions {
+      text-align: center;
+      padding: 50px 20px;
+      margin: 50px 20px;
+      border-radius: 20px;
+      background: var(--bg);
+      box-shadow: inset 6px 6px 12px var(--dark), inset -6px -6px 12px var(--light);
+    }
 
-        download_video(url, f'{format_choice}+bestaudio', file_path)
+    .instructions h2, .instructions h3, .instructions h4 {
+      color: #fff;
+    }
 
-        return redirect(url_for('download_success1',
-                                platform='Twitter (X)',
-                                video_filename=safe_title,
-                                video_title=title,
-                                thumbnail_url=thumbnail,
-                                video_size=video_size,
-                                duration=video_duration))
-    except Exception as e:
-        return f"Twitter (X) video download failed: {str(e)}", 500
+    .instructions h4 {
+      font-weight: normal;
+      color: #ccc;
+    }
 
+    footer {
+      text-align: center;
+      padding: 15px;
+      font-size: 14px;
+      color: #aaa;
+      background: var(--bg);
+      box-shadow: inset 5px 5px 10px var(--dark), inset -5px -5px 10px var(--light);
+    }
 
-@app.route('/download_tiktok', methods=['POST'])
-def download_tiktok_route():
-    url = request.form['url']
-    try:
-        formats = get_available_formats(url)
-        valid_formats = [f for f in formats if f.get('height')]
-        if not valid_formats:
-            return "No valid video formats found for TikTok.", 400
+    footer a {
+      color: #fff;
+      text-decoration: none;
+    }
 
-        format_choice = max(valid_formats, key=lambda f: f['height'])['format_id']
-        title, thumbnail, size, duration = get_video_details(url)
-        video_size = format_size(size)
-        video_duration = format_duration(duration)
-        safe_title = secure_filename(f"{title[:150].strip()}.mp4")
+    footer a:hover {
+      text-decoration: underline;
+    }
 
-        download_folder = get_download_folder()
-        file_path = os.path.join(download_folder, safe_title)
+    @media (max-width: 1024px) {
+      .card {
+        width: 45%;
+      }
+    }
 
-        download_video(url, f'{format_choice}+bestaudio', file_path)
+    @media (max-width: 600px) {
+      .card {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
 
-        return redirect(url_for('download_success1',
-                                platform='TikTok',
-                                video_filename=safe_title,
-                                video_title=title,
-                                thumbnail_url=thumbnail,
-                                video_size=video_size,
-                                duration=video_duration))
-    except Exception as e:
-        return f"TikTok video download failed: {str(e)}", 500
+<body>
 
+<header>
+  <a href="#"><img src="{{ url_for('static', filename='ic2.png') }}" alt="Logo"></a>
+  <h1>Welcome to the Download Center</h1>
+  <p>Choose a platform to start downloading videos and images!</p>
+</header>
 
-@app.route('/download_success')
-def download_success():
-    return render_template('download_success.html',
-                           platform=request.args.get('platform'),
-                           video_title=request.args.get('video_title'),
-                           thumbnail_url=request.args.get('thumbnail_url'),
-                           video_filename=request.args.get('video_filename'),
-                           audio_filename=request.args.get('audio_filename'),
-                           video_size=request.args.get('video_size'),
-                           duration=request.args.get('duration'))
+<nav>
+  <a href="#"><i class="fab fa-youtube"></i> YouTube</a>
+  <a href="#"><i class="fab fa-facebook"></i> Facebook</a>
+  <a href="#"><i class="fab fa-instagram"></i> Instagram</a>
+  <a href="#"><i class="fab fa-twitter"></i> Twitter</a>
+  <a href="#"><i class="fab fa-tiktok"></i> TikTok</a>
+</nav>
 
-@app.route('/download_success1')
-def download_success1():
-    return render_template('download_success1.html',
-                           platform=request.args.get('platform'),
-                           video_title=request.args.get('video_title'),
-                           thumbnail_url=request.args.get('thumbnail_url'),
-                           video_filename=request.args.get('video_filename'),
-                           video_size=request.args.get('video_size'),
-                           duration=request.args.get('duration'))
+<div class="container">
 
-@app.route('/download_file/<path:video_filename>')
-def download_file(video_filename):
-    try:
-        decoded_filename = unquote(video_filename)
-        safe_name = secure_filename(decoded_filename)
-        file_path = os.path.join(get_download_folder(), safe_name)
-        return send_file(file_path, as_attachment=True, download_name=safe_name)
-    except Exception as e:
-        return f"An error occurred: {str(e)}", 500
+  <!-- YouTube -->
+  <div class="card youtube-card">
+    <h3>YouTube Downloader</h3>
+    <p>Download high-quality videos from YouTube.</p>
+    <form action="/download_youtube" method="POST" onsubmit="showLoadingSpinner(event, 'youtube')">
+      <input type="url" name="url" placeholder="https://youtube.com/watch?v=..." required>
+      <select name="quality" required>
+        <option value="best">Best</option>
+        <option value="720p">720p</option>
+        <option value="1080p">1080p</option>
+      </select>
+      <button type="submit" id="youtubeDownloadButton">
+        Download <span class="spinner" id="youtubeSpinner"><i class="fas fa-spinner fa-spin"></i></span>
+      </button>
+    </form>
+  </div>
 
-if __name__ == '__main__':
-    app.run(debug=True)
- 
+  <!-- Facebook -->
+  <div class="card facebook-card">
+    <h3>Facebook Downloader</h3>
+    <p>Download videos and pictures from Facebook.</p>
+    <form action="/download_facebook" method="POST" onsubmit="showLoadingSpinner(event, 'facebook')">
+      <input type="url" name="url" placeholder="https://facebook.com/..." required>
+      <select name="quality" required>
+        <option value="default">Default</option>
+      </select>
+      <button type="submit" id="facebookDownloadButton">
+        Download <span class="spinner" id="facebookSpinner"><i class="fas fa-spinner fa-spin"></i></span>
+      </button>
+    </form>
+  </div>
+
+  <!-- Instagram -->
+  <div class="card instagram-card">
+    <h3>Instagram Downloader</h3>
+    <p>Download images and reels from Instagram.</p>
+    <form action="/download_instagram" method="POST" onsubmit="showLoadingSpinner(event, 'instagram')">
+      <input type="url" name="url" placeholder="https://instagram.com/..." required>
+      <select name="quality" required>
+        <option value="default">Default</option>
+      </select>
+      <button type="submit" id="instagramDownloadButton">
+        Download <span class="spinner" id="instagramSpinner"><i class="fas fa-spinner fa-spin"></i></span>
+      </button>
+    </form>
+  </div>
+
+  <!-- Twitter -->
+  <div class="card twitter-card">
+    <h3>Twitter Downloader</h3>
+    <p>Download videos from Twitter posts.</p>
+    <form action="/download_twitter" method="POST" onsubmit="showLoadingSpinner(event, 'twitter')">
+      <input type="url" name="url" placeholder="https://twitter.com/..." required>
+      <select name="quality" required>
+        <option value="default">Default</option>
+      </select>
+      <button type="submit" id="twitterDownloadButton">
+        Download <span class="spinner" id="twitterSpinner"><i class="fas fa-spinner fa-spin"></i></span>
+      </button>
+    </form>
+  </div>
+
+  <!-- TikTok -->
+  <div class="card tiktok-card">
+    <h3>TikTok Downloader</h3>
+    <p>Download TikTok videos in one click.</p>
+    <form action="/download_tiktok" method="POST" onsubmit="showLoadingSpinner(event, 'tiktok')">
+      <input type="url" name="url" placeholder="https://tiktok.com/@user/video/..." required>
+      <select name="quality" required>
+        <option value="default">Default</option>
+      </select>
+      <button type="submit" id="tiktokDownloadButton">
+        Download <span class="spinner" id="tiktokSpinner"><i class="fas fa-spinner fa-spin"></i></span>
+      </button>
+    </form>
+  </div>
+
+</div>
+
+<div class="instructions">
+  <h2><i class="fas fa-info-circle"></i> How to Use</h2>
+  <h3>1. Copy the Video URL</h3>
+  <h4>From your browser or app.</h4>
+  <h3>2. Paste It Above</h3>
+  <h4>Choose the correct platform card.</h4>
+  <h3>3. Choose Quality</h3>
+  <h4>Select the resolution or format.</h4>
+  <h3>4. Click Download</h3>
+  <h4>Your file will be ready in seconds.</h4>
+  <h4>This website is not affiliated with YouTube, Facebook, or Instagram. All rights belong to their respective owners.</h4>
+</div>
+
+<footer>
+  <a href="{{ url_for('static', filename='Copy&Rights.HTML') }}">© 2025 Free Video Downloader - All Rights Reserved</a>
+</footer>
+
+<script>
+  function showLoadingSpinner(event, platform) {
+    event.preventDefault();
+    const btn = document.getElementById(platform + 'DownloadButton');
+    const spinner = document.getElementById(platform + 'Spinner');
+    btn.disabled = true;
+    spinner.classList.add('active');
+    btn.innerHTML = "Please wait... " + spinner.outerHTML;
+    event.target.submit();
+  }
+</script>
+
+</body>
+</html>
