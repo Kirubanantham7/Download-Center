@@ -91,7 +91,7 @@ def download_youtube_route():
     download_video(url, format_choice, mp4_path)
     download_audio(url, mp3_path)
 
-    return redirect(url_for('download_success',
+    return redirect(url_for('download_success1',
                             platform='YouTube',
                             video_title=title,
                             thumbnail_url=thumbnail_url,
