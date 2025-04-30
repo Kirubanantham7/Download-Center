@@ -15,7 +15,7 @@ def get_download_folder():
         return os.path.join(os.environ["HOME"], "Downloads")
 
 def get_video_details(url):
-    with yt_dlp.YoutubeDL({'quiet': True}) as ydl:
+    with yt_dlp.YoutubeDL({'quiet': True, 'cookies': 'cookies_youtube.txt'}) as ydl:
         info = ydl.extract_info(url, download=False)
         title = info.get('title', 'video')
         thumbnail = info.get('thumbnail') or (info['thumbnails'][-1]['url'] if 'thumbnails' in info and info['thumbnails'] else '')
@@ -24,7 +24,7 @@ def get_video_details(url):
         return title, thumbnail, size, duration
 
 def get_available_formats(url):
-    with yt_dlp.YoutubeDL({'quiet': True}) as ydl:
+    with yt_dlp.YoutubeDL({'quiet': True, 'cookies': 'cookies_youtube.txt'}) as ydl:
         info = ydl.extract_info(url, download=False)
         return info.get('formats', [])
 
@@ -43,8 +43,8 @@ def download_video(url, format_choice, filename_path):
         'outtmpl': filename_path,
         'merge_output_format': 'mp4',
         'postprocessors': [{'key': 'FFmpegVideoConvertor', 'preferedformat': 'mp4'}],
-        'quiet': True
-        'cookies': 'cookies_youtube.txt',  # <- ✅ Add this line to use your cookies
+        'quiet': True,
+        'cookies': 'cookies_youtube.txt',  # ✅ Added correctly
     }
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         ydl.download([url])
@@ -58,8 +58,8 @@ def download_audio(url, filepath):
             'preferredcodec': 'mp3',
             'preferredquality': '192',
         }],
-        'quiet': True
-        'cookies': 'cookies_youtube.txt',  # <- ✅ Add this line to use your cookies
+        'quiet': True,
+        'cookies': 'cookies_youtube.txt',  # ✅ Added correctly
     }
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         ydl.download([url])
@@ -194,7 +194,6 @@ def download_twitter_route():
     except Exception as e:
         return f"Twitter (X) video download failed: {str(e)}", 500
 
-
 @app.route('/download_tiktok', methods=['POST'])
 def download_tiktok_route():
     url = request.form['url']
@@ -224,7 +223,6 @@ def download_tiktok_route():
                                 duration=video_duration))
     except Exception as e:
         return f"TikTok video download failed: {str(e)}", 500
-
 
 @app.route('/download_success')
 def download_success():
@@ -259,4 +257,3 @@ def download_file(video_filename):
 
 if __name__ == '__main__':
     app.run(debug=True)
- 
