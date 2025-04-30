@@ -44,6 +44,7 @@ def download_video(url, format_choice, filename_path):
         'merge_output_format': 'mp4',
         'postprocessors': [{'key': 'FFmpegVideoConvertor', 'preferedformat': 'mp4'}],
         'quiet': True
+        'cookies': 'cookies_youtube.txt',  # <- ✅ Add this line to use your cookies
     }
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         ydl.download([url])
@@ -58,6 +59,7 @@ def download_audio(url, filepath):
             'preferredquality': '192',
         }],
         'quiet': True
+        'cookies': 'cookies_youtube.txt',  # <- ✅ Add this line to use your cookies
     }
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         ydl.download([url])
