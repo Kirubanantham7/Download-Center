@@ -15,7 +15,7 @@ def get_download_folder():
         return os.path.join(os.environ["HOME"], "Downloads")
 
 def get_video_details(url):
-    with yt_dlp.YoutubeDL({'quiet': True, 'cookies': 'cookies_youtube.txt'}) as ydl:
+    with yt_dlp.YoutubeDL({'quiet': True, 'cookies':'my_flask_app/cookies_youtube.txt'}) as ydl:
         info = ydl.extract_info(url, download=False)
         title = info.get('title', 'video')
         thumbnail = info.get('thumbnail') or (info['thumbnails'][-1]['url'] if 'thumbnails' in info and info['thumbnails'] else '')
@@ -24,7 +24,7 @@ def get_video_details(url):
         return title, thumbnail, size, duration
 
 def get_available_formats(url):
-    with yt_dlp.YoutubeDL({'quiet': True, 'cookies': 'cookies_youtube.txt'}) as ydl:
+    with yt_dlp.YoutubeDL({'quiet': True, 'cookies':'my_flask_app/cookies_youtube.txt'}) as ydl:
         info = ydl.extract_info(url, download=False)
         return info.get('formats', [])
 
@@ -44,7 +44,7 @@ def download_video(url, format_choice, filename_path):
         'merge_output_format': 'mp4',
         'postprocessors': [{'key': 'FFmpegVideoConvertor', 'preferedformat': 'mp4'}],
         'quiet': True,
-        'cookies': 'cookies_youtube.txt',
+        'cookies': 'my_flask_app/cookies_youtube.txt'
         'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36',
     }
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
@@ -61,7 +61,7 @@ def download_audio(url, filepath):
             'preferredquality': '192',
         }],
         'quiet': True,
-        'cookies': 'cookies_youtube.txt',
+        'cookies': 'my_flask_app/cookies_youtube.txt'
         'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36',
     }
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
