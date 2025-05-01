@@ -38,32 +38,34 @@ def format_size(bytes_size):
     return f"{mb:.2f} MB"
 
 def download_video(url, format_choice, filename_path):
-    ydl_opts = {
-        'format': format_choice,
-        'outtmpl': filename_path,
-        'merge_output_format': 'mp4',
-        'postprocessors': [{'key': 'FFmpegVideoConvertor', 'preferedformat': 'mp4'}],
-        'quiet': True,
-        'cookies': 'my_flask_app/cookies_youtube.txt'
-        'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36',
-    }
+ydl_opts = {
+    'format': format_choice,
+    'outtmpl': filename_path,
+    'merge_output_format': 'mp4',
+    'postprocessors': [{'key': 'FFmpegVideoConvertor', 'preferedformat': 'mp4'}],
+    'quiet': True,
+    'cookies': 'my_flask_app/cookies_youtube.txt',  # ✅ Add comma here
+    'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36',
+}
+
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         ydl.download([url])
 
 
 def download_audio(url, filepath):
-    ydl_opts = {
-        'format': 'bestaudio/best',
-        'outtmpl': filepath,
-        'postprocessors': [{
-            'key': 'FFmpegExtractAudio',
-            'preferredcodec': 'mp3',
-            'preferredquality': '192',
-        }],
-        'quiet': True,
-        'cookies': 'my_flask_app/cookies_youtube.txt'
-        'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36',
-    }
+ydl_opts = {
+    'format': 'bestaudio/best',
+    'outtmpl': filepath,
+    'postprocessors': [{
+        'key': 'FFmpegExtractAudio',
+        'preferredcodec': 'mp3',
+        'preferredquality': '192',
+    }],
+    'quiet': True,
+    'cookies': 'my_flask_app/cookies_youtube.txt',  # ✅ Add comma here
+    'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36',
+}
+
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         ydl.download([url])
 
