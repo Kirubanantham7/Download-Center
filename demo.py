@@ -15,7 +15,7 @@ def get_download_folder():
         return os.path.join(os.environ["HOME"], "Downloads")
 
 def get_video_details(url):
-    with yt_dlp.YoutubeDL({'quiet': True, 'cookies':'my_flask_app/cookies_youtube.txt'}) as ydl:
+    with yt_dlp.YoutubeDL({'quiet': True, 'cookies': 'cookies_youtube.txt'}) as ydl:
         info = ydl.extract_info(url, download=False)
         title = info.get('title', 'video')
         thumbnail = info.get('thumbnail') or (info['thumbnails'][-1]['url'] if 'thumbnails' in info and info['thumbnails'] else '')
@@ -24,7 +24,7 @@ def get_video_details(url):
         return title, thumbnail, size, duration
 
 def get_available_formats(url):
-    with yt_dlp.YoutubeDL({'quiet': True, 'cookies':'my_flask_app/cookies_youtube.txt'}) as ydl:
+    with yt_dlp.YoutubeDL({'quiet': True, 'cookies': 'cookies_youtube.txt'}) as ydl:
         info = ydl.extract_info(url, download=False)
         return info.get('formats', [])
 
@@ -44,12 +44,10 @@ def download_video(url, format_choice, filename_path):
         'merge_output_format': 'mp4',
         'postprocessors': [{'key': 'FFmpegVideoConvertor', 'preferedformat': 'mp4'}],
         'quiet': True,
-        'cookies': 'my_flask_app/cookies_youtube.txt',
-        'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36',
+        'cookies': 'cookies_youtube.txt',  # ✅ Added correctly
     }
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         ydl.download([url])
-
 
 def download_audio(url, filepath):
     ydl_opts = {
@@ -61,12 +59,10 @@ def download_audio(url, filepath):
             'preferredquality': '192',
         }],
         'quiet': True,
-        'cookies': 'my_flask_app/cookies_youtube.txt',
-        'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36',
+        'cookies': 'cookies_youtube.txt',  # ✅ Added correctly
     }
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         ydl.download([url])
-
 
 @app.route('/')
 def index():
@@ -75,7 +71,7 @@ def index():
 @app.route('/download_youtube', methods=['POST'])
 def download_youtube_route():
     url = request.form['url']
-    quality = request.form.get('quality', 'best')
+    quality = request.form.get('quality', 'default')
     title, thumbnail_url, size, duration = get_video_details(url)
     video_size = format_size(size)
     video_duration = format_duration(duration)
@@ -87,13 +83,30 @@ def download_youtube_route():
     mp4_path = os.path.join(download_folder, mp4_filename)
     mp3_path = os.path.join(download_folder, mp3_filename)
 
-    format_choice = {
-        '1': "bestvideo[height<=720]+bestaudio/best",
-        '2': "bestvideo[height<=1080]+bestaudio/best",
-        '3': "bestvideo[height<=1440]+bestaudio/best",
-        '4': "bestvideo[height<=2160]+bestaudio/best"
-    }.get(quality, "best")
+    if quality == 'default':
+        # Just download YouTube's default best format
+        format_choice = 'best'
+    else:
+        # Convert string to integer resolution
+        max_res = int(quality)
 
+        # Get formats and filter video-only ones
+        formats = get_available_formats(url)
+        valid_video_formats = [f for f in formats if f.get('vcodec') != 'none' and f.get('height')]
+
+        # Find best video format within max resolution
+        best_format = max(
+            (f for f in valid_video_formats if f['height'] <= max_res),
+            key=lambda f: f.get('height', 0),
+            default=None
+        )
+
+        if not best_format:
+            return f"No suitable format available under {max_res}p", 400
+
+        format_choice = f"{best_format['format_id']}+bestaudio"
+
+    # Download video & audio
     download_video(url, format_choice, mp4_path)
     download_audio(url, mp3_path)
 
@@ -198,6 +211,7 @@ def download_twitter_route():
     except Exception as e:
         return f"Twitter (X) video download failed: {str(e)}", 500
 
+
 @app.route('/download_tiktok', methods=['POST'])
 def download_tiktok_route():
     url = request.form['url']
@@ -227,6 +241,7 @@ def download_tiktok_route():
                                 duration=video_duration))
     except Exception as e:
         return f"TikTok video download failed: {str(e)}", 500
+
 
 @app.route('/download_success')
 def download_success():
@@ -261,3 +276,4 @@ def download_file(video_filename):
 
 if __name__ == '__main__':
     app.run(debug=True)
+ 
