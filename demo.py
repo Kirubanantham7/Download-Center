@@ -8,6 +8,17 @@ from urllib.parse import unquote
 
 app = Flask(__name__)
 
+# Add this helper function near the top of your file
+def get_yt_dlp_opts(extra_opts=None):
+    base_opts = {
+        'quiet': True,
+        'cookiefile': 'cookies_youtube.txt',
+        'user_agent': "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36",
+    }
+    if extra_opts:
+        base_opts.update(extra_opts)
+    return base_opts
+
 def get_download_folder():
     if platform.system() == "Windows":
         return os.path.join(os.environ["USERPROFILE"], "Downloads")
@@ -24,7 +35,7 @@ def get_video_details(url):
         return title, thumbnail, size, duration
 
 def get_available_formats(url):
-    with yt_dlp.YoutubeDL({'quiet': True, 'cookies': 'cookies_youtube.txt'}) as ydl:
+    with yt_dlp.YoutubeDL(get_yt_dlp_opts()) as ydl:
         info = ydl.extract_info(url, download=False)
         return info.get('formats', [])
 
@@ -38,20 +49,17 @@ def format_size(bytes_size):
     return f"{mb:.2f} MB"
 
 def download_video(url, format_choice, filename_path):
-    ydl_opts = {
+    ydl_opts = get_yt_dlp_opts({
         'format': format_choice,
         'outtmpl': filename_path,
         'merge_output_format': 'mp4',
         'postprocessors': [{'key': 'FFmpegVideoConvertor', 'preferedformat': 'mp4'}],
-        'quiet': True,
-        'cookies': 'cookies_youtube.txt',  # ✅ Added correctly
-        "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36",
-    }
+    })
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         ydl.download([url])
 
 def download_audio(url, filepath):
-    ydl_opts = {
+    ydl_opts = get_yt_dlp_opts({
         'format': 'bestaudio/best',
         'outtmpl': filepath,
         'postprocessors': [{
@@ -59,10 +67,7 @@ def download_audio(url, filepath):
             'preferredcodec': 'mp3',
             'preferredquality': '192',
         }],
-        'quiet': True,
-        'cookies': 'cookies_youtube.txt',  # ✅ Added correctly
-        "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36",
-    }
+    })
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         ydl.download([url])
 
