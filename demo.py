@@ -26,7 +26,7 @@ def get_download_folder():
         return os.path.join(os.environ["HOME"], "Downloads")
 
 def get_video_details(url):
-    with yt_dlp.YoutubeDL({'quiet': True, 'cookies': 'cookies_youtube.txt'}) as ydl:
+    with yt_dlp.YoutubeDL(get_yt_dlp_opts()) as ydl:
         info = ydl.extract_info(url, download=False)
         title = info.get('title', 'video')
         thumbnail = info.get('thumbnail') or (info['thumbnails'][-1]['url'] if 'thumbnails' in info and info['thumbnails'] else '')
