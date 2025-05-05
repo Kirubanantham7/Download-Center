@@ -45,6 +45,7 @@ def download_video(url, format_choice, filename_path):
         'postprocessors': [{'key': 'FFmpegVideoConvertor', 'preferedformat': 'mp4'}],
         'quiet': True,
         'cookies': 'cookies_youtube.txt',  # ✅ Added correctly
+        "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36",
     }
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         ydl.download([url])
@@ -60,6 +61,7 @@ def download_audio(url, filepath):
         }],
         'quiet': True,
         'cookies': 'cookies_youtube.txt',  # ✅ Added correctly
+        "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36",
     }
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         ydl.download([url])
