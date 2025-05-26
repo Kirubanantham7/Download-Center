@@ -55,8 +55,11 @@ def download_video(url, format_choice, filename_path):
         'merge_output_format': 'mp4',
         'postprocessors': [{'key': 'FFmpegVideoConvertor', 'preferedformat': 'mp4'}],
     })
-    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-        ydl.download([url])
+    try:
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            ydl.download([url])
+    except DownloadError as e:
+        raise Exception(f"Download failed: {str(e)}")
 
 def download_audio(url, filepath):
     ydl_opts = get_yt_dlp_opts({
@@ -79,52 +82,50 @@ def index():
 def download_youtube_route():
     url = request.form['url']
     quality = request.form.get('quality', 'default')
-    title, thumbnail_url, size, duration = get_video_details(url)
-    video_size = format_size(size)
-    video_duration = format_duration(duration)
 
-    download_folder = get_download_folder()
-    base_title = secure_filename(title)
-    mp4_filename = f"{base_title}.mp4"
-    mp3_filename = f"{base_title}.mp3"
-    mp4_path = os.path.join(download_folder, mp4_filename)
-    mp3_path = os.path.join(download_folder, mp3_filename)
+    try:
+        title, thumbnail_url, size, duration = get_video_details(url)
+        video_size = format_size(size)
+        video_duration = format_duration(duration)
 
-    if quality == 'default':
-        # Just download YouTube's default best format
-        format_choice = 'best'
-    else:
-        # Convert string to integer resolution
-        max_res = int(quality)
+        download_folder = get_download_folder()
+        base_title = secure_filename(title)
+        mp4_filename = f"{base_title}.mp4"
+        mp3_filename = f"{base_title}.mp3"
+        mp4_path = os.path.join(download_folder, mp4_filename)
+        mp3_path = os.path.join(download_folder, mp3_filename)
 
-        # Get formats and filter video-only ones
-        formats = get_available_formats(url)
-        valid_video_formats = [f for f in formats if f.get('vcodec') != 'none' and f.get('height')]
+        if quality == 'default':
+            format_choice = 'best'
+        else:
+            max_res = int(quality)
+            formats = get_available_formats(url)
+            valid_video_formats = [f for f in formats if f.get('vcodec') != 'none' and f.get('height')]
 
-        # Find best video format within max resolution
-        best_format = max(
-            (f for f in valid_video_formats if f['height'] <= max_res),
-            key=lambda f: f.get('height', 0),
-            default=None
-        )
+            best_format = max(
+                (f for f in valid_video_formats if f['height'] <= max_res),
+                key=lambda f: f.get('height', 0),
+                default=None
+            )
 
-        if not best_format:
-            return f"No suitable format available under {max_res}p", 400
+            if not best_format:
+                return f"No suitable format available under {max_res}p", 400
 
-        format_choice = f"{best_format['format_id']}+bestaudio"
+            format_choice = f"{best_format['format_id']}+bestaudio"
 
-    # Download video & audio
-    download_video(url, format_choice, mp4_path)
-    download_audio(url, mp3_path)
+        download_video(url, format_choice, mp4_path)
+        download_audio(url, mp3_path)
 
-    return redirect(url_for('download_success',
-                            platform='YouTube',
-                            video_title=title,
-                            thumbnail_url=thumbnail_url,
-                            video_filename=mp4_filename,
-                            audio_filename=mp3_filename,
-                            video_size=video_size,
-                            duration=video_duration))
+        return redirect(url_for('download_success',
+                                platform='YouTube',
+                                video_title=title,
+                                thumbnail_url=thumbnail_url,
+                                video_filename=mp4_filename,
+                                audio_filename=mp3_filename,
+                                video_size=video_size,
+                                duration=video_duration))
+    except Exception as e:
+        return f"YouTube video download failed: {str(e)}", 500
 
 @app.route('/download_facebook', methods=['POST'])
 def download_facebook_route():
